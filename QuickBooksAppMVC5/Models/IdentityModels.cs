@@ -26,15 +26,18 @@ namespace QuickBooksAppMVC5.Models
             /*
             if (OAuthProfileId!=null) // && check claim not added already?
             {
-                var profile = await new QBAppMVC5Entities().OAuthProfiles.SingleOrDefaultAsync(p => p.Id == OAuthProfileId);
-                if (profile != null)
+                using (var ctx = new QBAppMVC5Entities())
                 {
-                    userIdentity.AddClaim(new Claim("OAuthProfileAccessToken", Utility.Decrypt(profile.AccessToken, ConfigurationManager.AppSettings["StorageSecurityKey"])));
-                    userIdentity.AddClaim(new Claim("OAuthProfileRealmId", profile.RealmId.ToString()));
-                    userIdentity.AddClaim(new Claim("OAuthProfileDatasource", profile.Datasource));
+                    var profile = await ctx.OAuthProfiles.SingleOrDefaultAsync(p => p.Id == OAuthProfileId);
+                    if (profile != null)
+                    {
+                        userIdentity.AddClaim(new Claim("OAuthProfileAccessToken", Utility.Decrypt(profile.AccessToken, ConfigurationManager.AppSettings["StorageSecurityKey"])));
+                        userIdentity.AddClaim(new Claim("OAuthProfileRealmId", profile.RealmId.ToString()));
+                        userIdentity.AddClaim(new Claim("OAuthProfileDatasource", profile.Datasource));
+                    }
                 }
-            }*/
-
+            }
+            */
             return userIdentity;
         }
 

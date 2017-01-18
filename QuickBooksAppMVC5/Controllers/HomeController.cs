@@ -34,17 +34,29 @@ namespace QuickBooksAppMVC5.Controllers
             Models.ApplicationUser userModel = HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>()
                     .FindById(User.Identity.GetUserId());
 
-            var oauthProfile = new QBAppMVC5Entities().OAuthProfiles.SingleOrDefault(p => p.Id == userModel.OAuthProfileId);
-            if (oauthProfile != null) // 'Guaranteed' given that [QuickBooksAuthorize] ensures a non-null userModel.OAuthProfileId.
+            string accessToken = null, accessSecret = null;
+            long realmID = -1;
+            using (var ctx = new QBAppMVC5Entities())
+            {
+                var oauthProfile = ctx.OAuthProfiles.SingleOrDefault(p => p.Id == userModel.OAuthProfileId);
+                if (oauthProfile != null) // 'Guaranteed' given that [QuickBooksAuthorize] ensures a non-null userModel.OAuthProfileId.
+                {
+                    accessToken = oauthProfile.AccessToken;
+                    accessSecret = oauthProfile.AccessSecret;
+                    realmID = oauthProfile.RealmId;
+                }
+            }
+            
+            if (accessToken!=null)
             {
                 try
                 {
                     var oAuthRequestValidator = new OAuthRequestValidator( // this is an Intuit object
-                        Utility.Decrypt(oauthProfile.AccessToken, ConfigurationManager.AppSettings["StorageSecurityKey"]),
-                        Utility.Decrypt(oauthProfile.AccessSecret, ConfigurationManager.AppSettings["StorageSecurityKey"]),
+                        Utility.Decrypt(accessToken, ConfigurationManager.AppSettings["StorageSecurityKey"]),
+                        Utility.Decrypt(accessSecret, ConfigurationManager.AppSettings["StorageSecurityKey"]),
                         ConfigurationManager.AppSettings["QBConsumerKey"],
                         ConfigurationManager.AppSettings["QBConsumerSecret"]);
-                    var serviceContext = new ServiceContext(oauthProfile.RealmId.ToString(), IntuitServicesType.QBO, oAuthRequestValidator);
+                    var serviceContext = new ServiceContext(realmID.ToString(), IntuitServicesType.QBO, oAuthRequestValidator);
 
                     QueryService<Customer> queryService = new QueryService<Customer>(serviceContext);
 

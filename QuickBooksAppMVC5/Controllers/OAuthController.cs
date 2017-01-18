@@ -87,22 +87,24 @@ namespace QuickBooksAppMVC5.Controllers
 
             if (sAccessToken!=null && sAccessTokenSecret!=null)
             {
-                var ctx = new QBAppMVC5Entities();
-                var newProfile = new OAuthProfile()
+                using (var ctx = new QBAppMVC5Entities())
                 {
-                    AccessToken = Utility.Encrypt(sAccessToken, ConfigurationManager.AppSettings["StorageSecurityKey"]),
-                    AccessSecret = Utility.Encrypt(sAccessTokenSecret, ConfigurationManager.AppSettings["StorageSecurityKey"]),
-                    Datasource = oAuthDataSource,
-                    RealmId = realmId
-                };
+                    var newProfile = new OAuthProfile()
+                    {
+                        AccessToken = Utility.Encrypt(sAccessToken, ConfigurationManager.AppSettings["StorageSecurityKey"]),
+                        AccessSecret = Utility.Encrypt(sAccessTokenSecret, ConfigurationManager.AppSettings["StorageSecurityKey"]),
+                        Datasource = oAuthDataSource,
+                        RealmId = realmId
+                    };
 
-                ctx.OAuthProfiles.Add(newProfile);
+                    ctx.OAuthProfiles.Add(newProfile);
 
-                var currentUser = ctx.AspNetUsers.SingleOrDefault(u => u.UserName == User.Identity.Name);
+                    var currentUser = ctx.AspNetUsers.SingleOrDefault(u => u.UserName == User.Identity.Name);
 
-                if (currentUser != null) currentUser.OAuthProfile = newProfile;
+                    if (currentUser != null) currentUser.OAuthProfile = newProfile;
 
-                ctx.SaveChanges();
+                    ctx.SaveChanges();
+                }
             }
             // Save...
 
