@@ -19,9 +19,8 @@ namespace QuickBooksAppMVC5.Controllers
     {
         public ActionResult Initiate(string returnURL)
         {
-            // directConntectToIntuit():
+            // via directConnectToIntuit():
             Session["OAuthReturnURL"] = returnURL;
-            ViewBag.StartURL = Request.Url.GetLeftPart(UriPartial.Authority) + "/OAuth/Begin";
             return View();
         }
 

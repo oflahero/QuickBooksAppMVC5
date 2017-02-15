@@ -39,6 +39,18 @@
 
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
+    <script type="text/javascript"
+            src="https://js.appcenter.intuit.com/Content/IA/intuit.ipp.anywhere-1.3.5.js">
+    </script>
+    <script type="text/javascript">
+        $(function () {
+            intuit.ipp.anywhere.setup(
+            {
+                grantUrl: '@(Request.Url.GetLeftPart(UriPartial.Authority) + "/OAuth/Begin")',
+                datasources: { quickbooks: true, payments: false }
+            });
+        });
+    </script>
     @RenderSection("scripts", required: false)
 </body>
 </html>
